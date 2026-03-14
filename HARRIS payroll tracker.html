@@ -1,0 +1,1288 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HARRIS payroll tracker</title>
+  <style>
+    :root {
+      --bg: #f3ede2;
+      --paper: rgba(255, 251, 245, 0.88);
+      --paper-strong: #fffaf0;
+      --ink: #2e2430;
+      --muted: #74656f;
+      --line: rgba(78, 55, 47, 0.16);
+      --accent: #a63d40;
+      --accent-deep: #7f2629;
+      --accent-soft: #efd4c5;
+      --success: #245c4f;
+      --shadow: 0 20px 60px rgba(67, 40, 29, 0.16);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Avenir Next", "Segoe UI", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top left, rgba(247, 204, 171, 0.72), transparent 32%),
+        radial-gradient(circle at right 20%, rgba(166, 61, 64, 0.12), transparent 24%),
+        linear-gradient(145deg, #efe6d6 0%, #f7f1e7 42%, #efe2d0 100%);
+      padding: 28px 18px 40px;
+    }
+
+    .shell {
+      width: min(1180px, 100%);
+      margin: 0 auto;
+      display: grid;
+      gap: 20px;
+    }
+
+    .hero,
+    .panel {
+      background: var(--paper);
+      border: 1px solid rgba(255, 255, 255, 0.55);
+      backdrop-filter: blur(16px);
+      box-shadow: var(--shadow);
+      border-radius: 24px;
+    }
+
+    .hero {
+      padding: 28px;
+      display: grid;
+      gap: 18px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      width: fit-content;
+      padding: 8px 14px;
+      border-radius: 999px;
+      background: rgba(166, 61, 64, 0.1);
+      color: var(--accent-deep);
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin: 0;
+    }
+
+    .hero-copy {
+      display: grid;
+      gap: 10px;
+      max-width: 720px;
+    }
+
+    .hero-copy h1 {
+      font-size: clamp(2rem, 4vw, 3.75rem);
+      line-height: 0.96;
+      letter-spacing: -0.05em;
+      font-family: Georgia, "Times New Roman", serif;
+    }
+
+    .hero-copy p {
+      color: var(--muted);
+      font-size: 1.04rem;
+      line-height: 1.6;
+    }
+
+    .hero-grid,
+    .content-grid,
+    .stats {
+      display: grid;
+      gap: 16px;
+    }
+
+    .hero-grid {
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    }
+
+    .mini-card {
+      background: linear-gradient(180deg, rgba(255, 250, 240, 0.96), rgba(248, 236, 223, 0.84));
+      border: 1px solid rgba(166, 61, 64, 0.12);
+      border-radius: 18px;
+      padding: 16px 18px;
+      display: grid;
+      gap: 6px;
+    }
+
+    .mini-card span {
+      color: var(--muted);
+      font-size: 0.82rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-weight: 700;
+    }
+
+    .mini-card strong {
+      font-size: 1.6rem;
+      font-weight: 800;
+    }
+
+    .content-grid {
+      grid-template-columns: minmax(0, 1.5fr) minmax(320px, 0.9fr);
+      align-items: start;
+    }
+
+    .panel {
+      padding: 22px;
+    }
+
+    .panel-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: start;
+      margin-bottom: 18px;
+    }
+
+    .panel-head p {
+      color: var(--muted);
+      margin-top: 6px;
+      line-height: 1.5;
+    }
+
+    .controls {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+
+    label {
+      display: grid;
+      gap: 7px;
+      color: var(--muted);
+      font-size: 0.9rem;
+      font-weight: 700;
+    }
+
+    input,
+    textarea {
+      width: 100%;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.7);
+      border-radius: 14px;
+      padding: 12px 14px;
+      font: inherit;
+      color: var(--ink);
+      transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+    }
+
+    input:focus,
+    textarea:focus {
+      outline: none;
+      border-color: rgba(166, 61, 64, 0.5);
+      box-shadow: 0 0 0 4px rgba(166, 61, 64, 0.12);
+      background: #fffefb;
+    }
+
+    textarea {
+      min-height: 72px;
+      resize: vertical;
+    }
+
+    .stats {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      margin-bottom: 18px;
+    }
+
+    .stat {
+      padding: 16px;
+      border-radius: 18px;
+      background: var(--paper-strong);
+      border: 1px solid rgba(78, 55, 47, 0.08);
+    }
+
+    .stat span {
+      display: block;
+      color: var(--muted);
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 8px;
+      font-weight: 700;
+    }
+
+    .stat strong {
+      font-size: clamp(1.4rem, 2vw, 2.1rem);
+      line-height: 1;
+    }
+
+    .timesheet {
+      display: grid;
+      gap: 12px;
+    }
+
+    .timesheet-head,
+    .entry-row {
+      display: grid;
+      grid-template-columns: minmax(136px, 0.9fr) 112px minmax(0, 1.5fr);
+      gap: 12px;
+      align-items: start;
+    }
+
+    .timesheet-head {
+      padding: 0 8px;
+      color: var(--muted);
+      font-size: 0.8rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .entry-row {
+      padding: 12px;
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.7);
+      border: 1px solid rgba(78, 55, 47, 0.08);
+    }
+
+    .date-lock {
+      min-height: 48px;
+      display: grid;
+      align-content: center;
+      padding: 10px 12px;
+      border-radius: 14px;
+      background: linear-gradient(180deg, rgba(239, 212, 197, 0.32), rgba(255, 255, 255, 0.5));
+      border: 1px solid rgba(166, 61, 64, 0.1);
+    }
+
+    .date-lock strong {
+      font-size: 0.98rem;
+    }
+
+    .date-lock span {
+      color: var(--muted);
+      font-size: 0.82rem;
+      margin-top: 3px;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    button {
+      border: 0;
+      border-radius: 999px;
+      padding: 12px 18px;
+      font: inherit;
+      font-weight: 800;
+      cursor: pointer;
+      transition: transform 0.16s ease, filter 0.16s ease, background 0.2s ease;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+      filter: brightness(1.02);
+    }
+
+    button.primary {
+      background: var(--accent);
+      color: white;
+    }
+
+    button.secondary {
+      background: rgba(166, 61, 64, 0.1);
+      color: var(--accent-deep);
+    }
+
+    button.ghost {
+      background: rgba(46, 36, 48, 0.08);
+      color: var(--ink);
+    }
+
+    .period-nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 18px;
+    }
+
+    .period-chip {
+      padding: 12px 16px;
+      border-radius: 999px;
+      background: rgba(46, 36, 48, 0.08);
+      color: var(--ink);
+      font-size: 0.92rem;
+      font-weight: 700;
+    }
+
+    .note {
+      color: var(--muted);
+      font-size: 0.92rem;
+      line-height: 1.5;
+    }
+
+    .meta-line {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      width: fit-content;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(36, 92, 79, 0.1);
+      color: var(--success);
+      font-size: 0.84rem;
+      font-weight: 800;
+      letter-spacing: 0.03em;
+    }
+
+    .status-pill.pending {
+      background: rgba(166, 61, 64, 0.1);
+      color: var(--accent-deep);
+    }
+
+    .status-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 999px;
+      background: currentColor;
+    }
+
+    .summary-stack {
+      display: grid;
+      gap: 16px;
+    }
+
+    .summary-card {
+      padding: 18px;
+      border-radius: 20px;
+      background: linear-gradient(180deg, rgba(255, 250, 245, 0.96), rgba(247, 237, 225, 0.82));
+      border: 1px solid rgba(78, 55, 47, 0.08);
+      display: grid;
+      gap: 12px;
+    }
+
+    .summary-card h3 {
+      font-size: 1rem;
+    }
+
+    .summary-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .summary-item {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: baseline;
+    }
+
+    .summary-item span {
+      color: var(--muted);
+    }
+
+    .summary-item strong.invoice-total {
+      font-size: 1.4rem;
+      color: var(--success);
+    }
+
+    .output {
+      width: 100%;
+      min-height: 180px;
+      border-radius: 18px;
+      border: 1px solid rgba(78, 55, 47, 0.08);
+      background: rgba(255, 255, 255, 0.72);
+      padding: 16px;
+      white-space: pre-wrap;
+      line-height: 1.5;
+      font-size: 0.96rem;
+    }
+
+    .invoice-lines {
+      display: grid;
+      gap: 8px;
+      font-size: 0.94rem;
+    }
+
+    .invoice-line {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      padding-bottom: 8px;
+      border-bottom: 1px dashed rgba(78, 55, 47, 0.16);
+    }
+
+    .footer-note {
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.9rem;
+      padding: 2px 0 10px;
+    }
+
+    @media (max-width: 900px) {
+      .content-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 700px) {
+      body {
+        padding: 16px 12px 28px;
+      }
+
+      .hero,
+      .panel {
+        padding: 18px;
+        border-radius: 20px;
+      }
+
+      .stats {
+        grid-template-columns: 1fr;
+      }
+
+      .timesheet-head {
+        display: none;
+      }
+
+      .entry-row {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <section class="hero">
+      <div class="eyebrow">Payroll-Ready Tracker</div>
+      <div class="hero-copy">
+        <h1>Track biweekly hours, notes, and payroll-ready invoices in one place.</h1>
+        <p>This app keeps a two-week log for your assistant, calculates earnings at the current hourly rate, and generates a clean invoice summary plus a copy-ready email message for payroll.</p>
+      </div>
+      <div class="hero-grid">
+        <article class="mini-card">
+          <span>Pay Schedule</span>
+          <strong>14 Days</strong>
+          <p>Each pay period is a fixed two-week block starting from your selected date.</p>
+        </article>
+        <article class="mini-card">
+          <span>Hourly Rate</span>
+          <strong id="heroRate">$55.00</strong>
+          <p>Editable if the rate changes later. All totals update automatically.</p>
+        </article>
+        <article class="mini-card">
+          <span>Payroll Hand-Off</span>
+          <strong>Invoice + Email</strong>
+          <p>Use the generated text directly in an email to the payroll company.</p>
+        </article>
+        <article class="mini-card">
+          <span>Sync Mode</span>
+          <strong id="syncState">Local Draft</strong>
+          <p id="syncMessage">Add Firebase config to sync this tracker live across devices.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="content-grid">
+      <section class="panel">
+        <div class="panel-head">
+          <div>
+            <h2>Time Entry</h2>
+            <p>Enter daily hours and optional notes. The tracker saves in your browser automatically.</p>
+          </div>
+        </div>
+
+        <div class="controls">
+          <label>
+            Assistant Name
+            <input id="assistantName" type="text" placeholder="Assistant name" />
+          </label>
+          <label>
+            Payroll Company
+            <input id="payrollCompany" type="text" placeholder="Payroll company name" />
+          </label>
+          <label>
+            Your Name / Business
+            <input id="businessName" type="text" placeholder="Approver or business name" />
+          </label>
+          <label>
+            Pay Period Start
+            <input id="periodStart" type="date" />
+          </label>
+          <label>
+            Hourly Rate ($)
+            <input id="hourlyRate" type="number" min="0" step="0.01" />
+          </label>
+          <label>
+            Invoice Number
+            <input id="invoiceNumber" type="text" placeholder="INV-2026-001" />
+          </label>
+        </div>
+
+        <div class="stats">
+          <article class="stat">
+            <span>Total Hours</span>
+            <strong id="totalHours">0.00</strong>
+          </article>
+          <article class="stat">
+            <span>Total Pay</span>
+            <strong id="totalPay">$0.00</strong>
+          </article>
+          <article class="stat">
+            <span>Period Ends</span>
+            <strong id="periodEndLabel">-</strong>
+          </article>
+        </div>
+
+        <div class="period-nav">
+          <button class="secondary" id="previousPeriodBtn" type="button">Previous Period</button>
+          <button class="ghost" id="currentPeriodBtn" type="button">Current Period</button>
+          <button class="secondary" id="nextPeriodBtn" type="button">Next Period</button>
+          <div class="period-chip" id="periodChip">Current pay period</div>
+        </div>
+
+        <div class="timesheet">
+          <div class="timesheet-head">
+            <div>Date</div>
+            <div>Hours</div>
+            <div>Notes</div>
+          </div>
+          <div id="entries"></div>
+        </div>
+
+        <div class="actions">
+          <button class="secondary" id="copyShareLinkBtn" type="button">Copy Share Link</button>
+          <button class="primary" id="copyInvoiceBtn" type="button">Copy Invoice Text</button>
+          <button class="secondary" id="copyEmailBtn" type="button">Copy Payroll Email</button>
+          <button class="ghost" id="printBtn" type="button">Print / Save PDF</button>
+          <button class="ghost" id="resetBtn" type="button">Reset Current Period</button>
+        </div>
+      </section>
+
+      <aside class="summary-stack">
+        <section class="panel">
+          <div class="panel-head">
+            <div>
+              <h2>Invoice Preview</h2>
+              <p>A concise payroll summary for this pay period.</p>
+            </div>
+          </div>
+          <div class="summary-card">
+            <div class="summary-list">
+              <div class="summary-item"><span>Invoice Number</span><strong id="summaryInvoiceNumber">-</strong></div>
+              <div class="summary-item"><span>Assistant</span><strong id="summaryAssistant">-</strong></div>
+              <div class="summary-item"><span>Pay Period</span><strong id="summaryPeriod">-</strong></div>
+              <div class="summary-item"><span>Hourly Rate</span><strong id="summaryRate">$55.00</strong></div>
+              <div class="summary-item"><span>Total Hours</span><strong id="summaryHours">0.00</strong></div>
+              <div class="summary-item"><span>Projected Invoice</span><strong class="invoice-total" id="summaryPay">$0.00</strong></div>
+            </div>
+          </div>
+          <div id="invoiceLineItems" class="invoice-lines"></div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-head">
+            <div>
+              <h2>Copy-Ready Invoice Text</h2>
+              <p>Paste into an email or attach as a PDF after printing.</p>
+            </div>
+          </div>
+          <div id="invoiceText" class="output"></div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-head">
+            <div>
+              <h2>Payroll Email Draft</h2>
+              <p>Short message to send with the invoice for the same period.</p>
+            </div>
+          </div>
+          <div id="emailText" class="output"></div>
+        </section>
+      </aside>
+    </section>
+
+    <div class="footer-note">
+      <div class="meta-line">
+        <span class="status-pill pending" id="syncStatusPill"><span class="status-dot"></span><span id="syncStatusText">Local only</span></span>
+        <span id="workspaceLabel">Workspace: main</span>
+      </div>
+    </div>
+  </main>
+
+  <script type="module">
+    import { firebaseConfig, defaultWorkspaceId } from "./firebase-config.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signInAnonymously } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
+    import { doc, getDoc, getFirestore, onSnapshot, serverTimestamp, setDoc } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
+
+    const STORAGE_KEY = "assistant-time-tracker-v3";
+    const FIRST_PERIOD_START = "2026-03-09";
+    const FIRST_PERIOD_END = "2026-03-13";
+    const ROLLING_PERIOD_START = "2026-03-14";
+    const ROLLING_PERIOD_LENGTH = 14;
+    const SAVE_DEBOUNCE_MS = 450;
+
+    const state = {
+      assistantName: "Corina Elgart",
+      payrollCompany: "PBI Payroll",
+      businessName: "Stephen U. Harris, MD",
+      periodStart: getDefaultStartDate(),
+      hourlyRate: 55,
+      invoiceNumber: "",
+      entries: [],
+    };
+
+    const sync = {
+      enabled: false,
+      ready: false,
+      db: null,
+      docRef: null,
+      unsubscribe: null,
+      saveTimer: null,
+      workspaceId: getWorkspaceId(),
+      source: "local",
+    };
+
+    const elements = {
+      assistantName: document.getElementById("assistantName"),
+      payrollCompany: document.getElementById("payrollCompany"),
+      businessName: document.getElementById("businessName"),
+      periodStart: document.getElementById("periodStart"),
+      hourlyRate: document.getElementById("hourlyRate"),
+      invoiceNumber: document.getElementById("invoiceNumber"),
+      entries: document.getElementById("entries"),
+      totalHours: document.getElementById("totalHours"),
+      totalPay: document.getElementById("totalPay"),
+      periodEndLabel: document.getElementById("periodEndLabel"),
+      heroRate: document.getElementById("heroRate"),
+      summaryInvoiceNumber: document.getElementById("summaryInvoiceNumber"),
+      summaryAssistant: document.getElementById("summaryAssistant"),
+      summaryPeriod: document.getElementById("summaryPeriod"),
+      summaryRate: document.getElementById("summaryRate"),
+      summaryHours: document.getElementById("summaryHours"),
+      summaryPay: document.getElementById("summaryPay"),
+      invoiceLineItems: document.getElementById("invoiceLineItems"),
+      invoiceText: document.getElementById("invoiceText"),
+      emailText: document.getElementById("emailText"),
+      copyShareLinkBtn: document.getElementById("copyShareLinkBtn"),
+      copyInvoiceBtn: document.getElementById("copyInvoiceBtn"),
+      copyEmailBtn: document.getElementById("copyEmailBtn"),
+      printBtn: document.getElementById("printBtn"),
+      resetBtn: document.getElementById("resetBtn"),
+      previousPeriodBtn: document.getElementById("previousPeriodBtn"),
+      currentPeriodBtn: document.getElementById("currentPeriodBtn"),
+      nextPeriodBtn: document.getElementById("nextPeriodBtn"),
+      periodChip: document.getElementById("periodChip"),
+      syncState: document.getElementById("syncState"),
+      syncMessage: document.getElementById("syncMessage"),
+      syncStatusPill: document.getElementById("syncStatusPill"),
+      syncStatusText: document.getElementById("syncStatusText"),
+      workspaceLabel: document.getElementById("workspaceLabel"),
+    };
+
+    bootstrap();
+
+    async function bootstrap() {
+      loadState();
+      syncForm();
+      rebuildEntries();
+      render();
+      bindEvents();
+      await initializeSync();
+    }
+
+    async function initializeSync() {
+      updateSyncUI("Checking sync setup...", "pending");
+
+      if (!isFirebaseConfigured(firebaseConfig)) {
+        sync.enabled = false;
+        sync.source = "local";
+        updateSyncUI("Local Draft", "pending", "Firebase config is still a placeholder. Update firebase-config.js, then publish to GitHub Pages.");
+        return;
+      }
+
+      try {
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        sync.db = getFirestore(app);
+        sync.docRef = doc(sync.db, "trackers", sync.workspaceId);
+        sync.enabled = true;
+        updateSyncUI("Connecting...", "pending", "Signing in anonymously and connecting this workspace to Firestore.");
+
+        await signInAnonymously(auth);
+        await new Promise((resolve, reject) => {
+          const stop = onAuthStateChanged(auth, (user) => {
+            stop();
+            if (user) {
+              resolve();
+              return;
+            }
+            reject(new Error("Anonymous sign-in did not return a user."));
+          }, reject);
+        });
+
+        sync.ready = true;
+
+        const snapshot = await getDoc(sync.docRef);
+        if (!snapshot.exists()) {
+          await setDoc(sync.docRef, buildRemotePayload(), { merge: true });
+        }
+
+        sync.unsubscribe = onSnapshot(sync.docRef, (remoteSnapshot) => {
+          if (!remoteSnapshot.exists()) {
+            return;
+          }
+
+          applyRemoteState(remoteSnapshot.data());
+          render();
+        });
+      } catch (error) {
+        console.error(error);
+        sync.enabled = false;
+        sync.ready = false;
+        sync.source = "local";
+        updateSyncUI("Local Draft", "pending", "Firebase setup failed. Check the project config and Firestore rules.");
+      }
+    }
+
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) {
+          state.periodStart = normalizePeriodStart(state.periodStart);
+          state.invoiceNumber = buildInvoiceNumber(state.periodStart);
+          state.entries = buildEntries(state.periodStart, []);
+          return;
+        }
+
+        const saved = JSON.parse(raw);
+        applyPartialState(saved);
+      } catch {
+        state.periodStart = normalizePeriodStart(state.periodStart);
+        state.invoiceNumber = buildInvoiceNumber(state.periodStart);
+        state.entries = buildEntries(state.periodStart, []);
+      }
+    }
+
+    function applyPartialState(payload) {
+      state.assistantName = payload.assistantName || state.assistantName;
+      state.payrollCompany = payload.payrollCompany || state.payrollCompany;
+      state.businessName = payload.businessName || state.businessName;
+      state.periodStart = isValidISODate(payload.periodStart) ? normalizePeriodStart(payload.periodStart) : normalizePeriodStart(state.periodStart);
+      state.hourlyRate = toMoneyNumber(payload.hourlyRate, 55);
+      state.invoiceNumber = payload.invoiceNumber || buildInvoiceNumber(state.periodStart);
+      state.entries = buildEntries(state.periodStart, Array.isArray(payload.entries) ? payload.entries : []);
+    }
+
+    function applyRemoteState(payload) {
+      applyPartialState(payload || {});
+      sync.source = "firebase";
+      syncForm();
+      rebuildEntries();
+      updateSyncUI("Live Sync", "connected", "Changes now sync through Firestore for every device using this workspace link.");
+    }
+
+    function syncForm() {
+      elements.assistantName.value = state.assistantName;
+      elements.payrollCompany.value = state.payrollCompany;
+      elements.businessName.value = state.businessName;
+      elements.periodStart.value = state.periodStart;
+      elements.hourlyRate.value = state.hourlyRate.toFixed(2);
+      elements.invoiceNumber.value = state.invoiceNumber || buildInvoiceNumber(state.periodStart);
+    }
+
+    function bindEvents() {
+      elements.assistantName.addEventListener("input", () => {
+        state.assistantName = elements.assistantName.value.trim() || "Corina Elgart";
+        persistAndRender();
+      });
+
+      elements.payrollCompany.addEventListener("input", () => {
+        state.payrollCompany = elements.payrollCompany.value.trim() || "PBI Payroll";
+        persistAndRender();
+      });
+
+      elements.businessName.addEventListener("input", () => {
+        state.businessName = elements.businessName.value.trim() || "Stephen U. Harris, MD";
+        persistAndRender();
+      });
+
+      elements.periodStart.addEventListener("input", () => {
+        const nextStart = normalizePeriodStart(elements.periodStart.value || getDefaultStartDate());
+        setPeriod(nextStart);
+      });
+
+      elements.hourlyRate.addEventListener("input", () => {
+        state.hourlyRate = toMoneyNumber(elements.hourlyRate.value, 55);
+        persistAndRender();
+      });
+
+      elements.invoiceNumber.addEventListener("input", () => {
+        state.invoiceNumber = elements.invoiceNumber.value.trim();
+        persistAndRender();
+      });
+
+      elements.copyShareLinkBtn.addEventListener("click", async () => {
+        await copyText(buildShareLink(), elements.copyShareLinkBtn, "Share Link Copied");
+      });
+
+      elements.copyInvoiceBtn.addEventListener("click", async () => {
+        await copyText(elements.invoiceText.textContent, elements.copyInvoiceBtn, "Invoice Copied");
+      });
+
+      elements.copyEmailBtn.addEventListener("click", async () => {
+        await copyText(elements.emailText.textContent, elements.copyEmailBtn, "Email Copied");
+      });
+
+      elements.printBtn.addEventListener("click", () => {
+        window.print();
+      });
+
+      elements.resetBtn.addEventListener("click", () => {
+        state.entries = buildEntries(state.periodStart, []);
+        rebuildEntries();
+        persistAndRender();
+      });
+
+      elements.previousPeriodBtn.addEventListener("click", () => {
+        setPeriod(getAdjacentPeriodStart(state.periodStart, -1));
+      });
+
+      elements.currentPeriodBtn.addEventListener("click", () => {
+        setPeriod(getDefaultStartDate());
+      });
+
+      elements.nextPeriodBtn.addEventListener("click", () => {
+        setPeriod(getAdjacentPeriodStart(state.periodStart, 1));
+      });
+    }
+
+    function buildEntries(startDate, existingEntries) {
+      const existingMap = new Map(existingEntries.map((entry) => [entry.date, entry]));
+      const entries = [];
+      const periodDates = getPeriodDates(startDate);
+
+      for (let index = 0; index < periodDates.length; index += 1) {
+        const date = periodDates[index];
+        const existing = existingMap.get(date);
+        entries.push({
+          date,
+          hours: existing ? sanitizeHours(existing.hours) : "",
+          notes: existing ? String(existing.notes || "") : "",
+        });
+      }
+
+      return entries;
+    }
+
+    function rebuildEntries() {
+      elements.entries.innerHTML = "";
+
+      state.entries.forEach((entry, index) => {
+        const row = document.createElement("article");
+        row.className = "entry-row";
+
+        const dateBlock = document.createElement("div");
+        dateBlock.className = "date-lock";
+        dateBlock.innerHTML = "<strong>" + formatWeekday(entry.date) + "</strong><span>" + formatLongDate(entry.date) + "</span>";
+
+        const hoursInput = document.createElement("input");
+        hoursInput.type = "number";
+        hoursInput.min = "0";
+        hoursInput.step = "0.25";
+        hoursInput.placeholder = "0.00";
+        hoursInput.value = entry.hours;
+        hoursInput.setAttribute("aria-label", "Hours for " + formatLongDate(entry.date));
+        hoursInput.addEventListener("input", () => {
+          state.entries[index].hours = sanitizeHours(hoursInput.value);
+          persistAndRender();
+        });
+
+        const notesInput = document.createElement("textarea");
+        notesInput.placeholder = "Optional notes for tasks, meetings, deadlines, or exceptions";
+        notesInput.value = entry.notes;
+        notesInput.setAttribute("aria-label", "Notes for " + formatLongDate(entry.date));
+        notesInput.addEventListener("input", () => {
+          state.entries[index].notes = notesInput.value;
+          persistAndRender();
+        });
+
+        row.append(dateBlock, hoursInput, notesInput);
+        elements.entries.appendChild(row);
+      });
+    }
+
+    function render() {
+      const totals = calculateTotals();
+      const periodEnd = getPeriodEnd(state.periodStart);
+      const invoiceNumber = state.invoiceNumber || buildInvoiceNumber(state.periodStart);
+      const invoiceText = buildInvoiceText(totals, invoiceNumber, periodEnd);
+      const emailText = buildEmailText(totals, invoiceNumber, periodEnd);
+
+      elements.totalHours.textContent = totals.hours.toFixed(2);
+      elements.totalPay.textContent = formatCurrency(totals.pay);
+      elements.periodEndLabel.textContent = formatShortDate(periodEnd);
+      elements.periodStart.value = state.periodStart;
+      elements.heroRate.textContent = formatCurrency(state.hourlyRate);
+      elements.periodChip.textContent = "Viewing " + formatShortDate(state.periodStart) + " - " + formatShortDate(periodEnd);
+      elements.workspaceLabel.textContent = "Workspace: " + sync.workspaceId;
+
+      elements.summaryInvoiceNumber.textContent = invoiceNumber;
+      elements.summaryAssistant.textContent = state.assistantName;
+      elements.summaryPeriod.textContent = formatLongDate(state.periodStart) + " - " + formatLongDate(periodEnd);
+      elements.summaryRate.textContent = formatCurrency(state.hourlyRate);
+      elements.summaryHours.textContent = totals.hours.toFixed(2);
+      elements.summaryPay.textContent = formatCurrency(totals.pay);
+
+      elements.invoiceText.textContent = invoiceText;
+      elements.emailText.textContent = emailText;
+      renderInvoiceLines();
+    }
+
+    function renderInvoiceLines() {
+      elements.invoiceLineItems.innerHTML = "";
+
+      const billableEntries = state.entries.filter((entry) => Number(entry.hours) > 0);
+      if (billableEntries.length === 0) {
+        const empty = document.createElement("p");
+        empty.className = "note";
+        empty.textContent = "Daily line items will appear here once hours are added.";
+        elements.invoiceLineItems.appendChild(empty);
+        return;
+      }
+
+      billableEntries.forEach((entry) => {
+        const line = document.createElement("div");
+        line.className = "invoice-line";
+        line.innerHTML = "<span>" + formatShortDate(entry.date) + " • " + escapeHtml(entry.notes.trim() || "Administrative support") + "</span><strong>" + entry.hours + " hrs</strong>";
+        elements.invoiceLineItems.appendChild(line);
+      });
+    }
+
+    function calculateTotals() {
+      const hours = state.entries.reduce((sum, entry) => sum + Number(entry.hours || 0), 0);
+      return {
+        hours,
+        pay: hours * state.hourlyRate,
+      };
+    }
+
+    function buildInvoiceText(totals, invoiceNumber, periodEnd) {
+      const lines = [
+        "INVOICE",
+        "",
+        "Invoice Number: " + invoiceNumber,
+        "Assistant: " + state.assistantName,
+        "Submitted By: " + state.businessName,
+        "Pay Period: " + formatLongDate(state.periodStart) + " - " + formatLongDate(periodEnd),
+        "Hourly Rate: " + formatCurrency(state.hourlyRate),
+        "Total Hours: " + totals.hours.toFixed(2),
+        "Total Amount Due: " + formatCurrency(totals.pay),
+        "",
+        "Daily Breakdown:",
+      ];
+
+      state.entries.forEach((entry) => {
+        const hours = Number(entry.hours || 0);
+        if (!hours && !entry.notes.trim()) {
+          return;
+        }
+
+        const parts = [formatShortDate(entry.date) + ": " + hours.toFixed(2) + " hrs"];
+        if (entry.notes.trim()) {
+          parts.push("- " + entry.notes.trim());
+        }
+        lines.push(parts.join(" "));
+      });
+
+      if (lines[lines.length - 1] === "Daily Breakdown:") {
+        lines.push("No hours entered for this period yet.");
+      }
+
+      lines.push("");
+      lines.push("Please process this pay period according to the totals above.");
+      return lines.join("\n");
+    }
+
+    function buildEmailText(totals, invoiceNumber, periodEnd) {
+      return [
+        "Subject: " + state.assistantName + " payroll for " + formatShortDate(state.periodStart) + " - " + formatShortDate(periodEnd),
+        "",
+        "Hello " + state.payrollCompany + ",",
+        "",
+        "Please find the payroll summary for " + state.assistantName + " for the pay period " + formatLongDate(state.periodStart) + " through " + formatLongDate(periodEnd) + ".",
+        "",
+        "Invoice Number: " + invoiceNumber,
+        "Total Hours: " + totals.hours.toFixed(2),
+        "Hourly Rate: " + formatCurrency(state.hourlyRate),
+        "Total Amount Due: " + formatCurrency(totals.pay),
+        "",
+        "Please confirm receipt and let me know if anything else is needed.",
+        "",
+        "Thank you,",
+        state.businessName,
+      ].join("\n");
+    }
+
+    function persistAndRender() {
+      render();
+      persistState();
+    }
+
+    function persistState() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(buildLocalPayload()));
+      scheduleRemoteSave();
+    }
+
+    function scheduleRemoteSave() {
+      if (!sync.ready || !sync.docRef) {
+        return;
+      }
+
+      window.clearTimeout(sync.saveTimer);
+      sync.saveTimer = window.setTimeout(async () => {
+        try {
+          await setDoc(sync.docRef, buildRemotePayload(), { merge: true });
+          updateSyncUI("Live Sync", "connected", "Changes are syncing live for every device using this workspace.");
+        } catch (error) {
+          console.error(error);
+          updateSyncUI("Sync Error", "pending", "Unable to write to Firestore. Check your network connection and Firestore rules.");
+        }
+      }, SAVE_DEBOUNCE_MS);
+    }
+
+    function buildLocalPayload() {
+      return {
+        assistantName: state.assistantName,
+        payrollCompany: state.payrollCompany,
+        businessName: state.businessName,
+        periodStart: state.periodStart,
+        hourlyRate: state.hourlyRate,
+        invoiceNumber: state.invoiceNumber,
+        entries: state.entries,
+      };
+    }
+
+    function buildRemotePayload() {
+      return {
+        ...buildLocalPayload(),
+        workspaceId: sync.workspaceId,
+        updatedAt: serverTimestamp(),
+      };
+    }
+
+    async function copyText(value, button, copiedLabel) {
+      const original = button.textContent;
+      try {
+        await navigator.clipboard.writeText(value);
+        button.textContent = copiedLabel;
+      } catch {
+        button.textContent = "Copy Failed";
+      }
+
+      window.setTimeout(() => {
+        button.textContent = original;
+      }, 1400);
+    }
+
+    function updateSyncUI(label, mode, message) {
+      elements.syncState.textContent = label;
+      elements.syncMessage.textContent = message || "";
+      elements.syncStatusText.textContent = mode === "connected" ? "Firebase live" : label;
+      elements.syncStatusPill.classList.toggle("pending", mode !== "connected");
+    }
+
+    function buildShareLink() {
+      const url = new URL(window.location.href);
+      url.searchParams.set("workspace", sync.workspaceId);
+      return url.toString();
+    }
+
+    function getWorkspaceId() {
+      const params = new URLSearchParams(window.location.search);
+      return slugify(params.get("workspace") || defaultWorkspaceId || "main");
+    }
+
+    function isFirebaseConfigured(config) {
+      if (!config) {
+        return false;
+      }
+
+      const requiredKeys = ["apiKey", "authDomain", "projectId", "appId"];
+      return requiredKeys.every((key) => typeof config[key] === "string" && config[key] && !config[key].startsWith("REPLACE_"));
+    }
+
+    function sanitizeHours(value) {
+      if (value === "") return "";
+      const number = Number(value);
+      if (!Number.isFinite(number) || number < 0) return "";
+      return number.toFixed(2);
+    }
+
+    function toMoneyNumber(value, fallback) {
+      const number = Number(value);
+      return Number.isFinite(number) && number >= 0 ? number : fallback;
+    }
+
+    function buildInvoiceNumber(date) {
+      const [year, month, day] = date.split("-");
+      return "INV-" + year + month + day;
+    }
+
+    function setPeriod(nextStart) {
+      state.periodStart = nextStart;
+      state.invoiceNumber = buildInvoiceNumber(nextStart);
+      elements.invoiceNumber.value = state.invoiceNumber;
+      state.entries = buildEntries(nextStart, state.entries);
+      rebuildEntries();
+      persistAndRender();
+    }
+
+    function getDefaultStartDate() {
+      const todayIso = toISODate(new Date());
+
+      if (todayIso <= FIRST_PERIOD_END) {
+        return FIRST_PERIOD_START;
+      }
+
+      if (todayIso < ROLLING_PERIOD_START) {
+        return FIRST_PERIOD_START;
+      }
+
+      const diffDays = daysBetween(ROLLING_PERIOD_START, todayIso);
+      const periodOffset = Math.floor(diffDays / ROLLING_PERIOD_LENGTH);
+      return addDays(ROLLING_PERIOD_START, periodOffset * ROLLING_PERIOD_LENGTH);
+    }
+
+    function normalizePeriodStart(dateString) {
+      if (!isValidISODate(dateString)) {
+        return getDefaultStartDate();
+      }
+
+      if (dateString <= FIRST_PERIOD_END) {
+        return FIRST_PERIOD_START;
+      }
+
+      if (dateString < ROLLING_PERIOD_START) {
+        return FIRST_PERIOD_START;
+      }
+
+      const diffDays = daysBetween(ROLLING_PERIOD_START, dateString);
+      const periodOffset = Math.floor(diffDays / ROLLING_PERIOD_LENGTH);
+      return addDays(ROLLING_PERIOD_START, periodOffset * ROLLING_PERIOD_LENGTH);
+    }
+
+    function getAdjacentPeriodStart(startDate, direction) {
+      if (startDate === FIRST_PERIOD_START && direction < 0) {
+        return FIRST_PERIOD_START;
+      }
+
+      if (startDate === FIRST_PERIOD_START && direction > 0) {
+        return ROLLING_PERIOD_START;
+      }
+
+      return normalizePeriodStart(addDays(startDate, direction * ROLLING_PERIOD_LENGTH));
+    }
+
+    function getPeriodDates(startDate) {
+      const endDate = getPeriodEnd(startDate);
+      const totalDays = daysBetween(startDate, endDate) + 1;
+      return Array.from({ length: totalDays }, (_, index) => addDays(startDate, index));
+    }
+
+    function getPeriodEnd(startDate) {
+      if (startDate === FIRST_PERIOD_START) {
+        return FIRST_PERIOD_END;
+      }
+
+      return addDays(startDate, ROLLING_PERIOD_LENGTH - 1);
+    }
+
+    function addDays(dateString, days) {
+      const date = new Date(dateString + "T00:00:00");
+      date.setDate(date.getDate() + days);
+      return toISODate(date);
+    }
+
+    function toISODate(date) {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, "0");
+      const day = String(date.getDate()).padStart(2, "0");
+      return year + "-" + month + "-" + day;
+    }
+
+    function isValidISODate(value) {
+      return typeof value === "string" && /^\d{4}-\d{2}-\d{2}$/.test(value);
+    }
+
+    function daysBetween(startDate, endDate) {
+      const start = new Date(startDate + "T00:00:00");
+      const end = new Date(endDate + "T00:00:00");
+      const millisecondsPerDay = 24 * 60 * 60 * 1000;
+      return Math.floor((end - start) / millisecondsPerDay);
+    }
+
+    function formatCurrency(value) {
+      return new Intl.NumberFormat("en-US", {
+        style: "currency",
+        currency: "USD",
+      }).format(value);
+    }
+
+    function formatWeekday(dateString) {
+      return new Intl.DateTimeFormat("en-US", {
+        weekday: "long",
+      }).format(new Date(dateString + "T00:00:00"));
+    }
+
+    function formatLongDate(dateString) {
+      return new Intl.DateTimeFormat("en-US", {
+        month: "long",
+        day: "numeric",
+        year: "numeric",
+      }).format(new Date(dateString + "T00:00:00"));
+    }
+
+    function formatShortDate(dateString) {
+      return new Intl.DateTimeFormat("en-US", {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+      }).format(new Date(dateString + "T00:00:00"));
+    }
+
+    function slugify(value) {
+      return String(value || "main")
+        .trim()
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, "") || "main";
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll("\"", "&quot;")
+        .replaceAll("'", "&#39;");
+    }
+  </script>
+</body>
+</html>
